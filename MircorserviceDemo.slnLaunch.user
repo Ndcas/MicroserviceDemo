@@ -1,0 +1,19 @@
+[
+  {
+    "Name": "Default",
+    "Projects": [
+      {
+        "Path": "Backend\\gateway\\gateway.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "Backend\\services\\user\\user.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "Backend\\services\\log\\log.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]
