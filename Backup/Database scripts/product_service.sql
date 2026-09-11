@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: mysql
--- Thời gian đã tạo: Th8 27, 2026 lúc 03:57 PM
+-- Thời gian đã tạo: Th9 11, 2026 lúc 03:52 AM
 -- Phiên bản máy phục vụ: 9.7.1
 -- Phiên bản PHP: 8.3.32
 
@@ -64,6 +64,32 @@ INSERT INTO `brand_type` (`product_type_id`, `brand_id`) VALUES
 (1, 2),
 (2, 3),
 (2, 4);
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `inbox_messages`
+--
+
+CREATE TABLE `inbox_messages` (
+  `event_id` char(36) NOT NULL,
+  `processed_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `outbox_messages`
+--
+
+CREATE TABLE `outbox_messages` (
+  `id` int NOT NULL,
+  `event_id` char(36) NOT NULL,
+  `topic` varchar(255) NOT NULL,
+  `payload` text NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `published_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -146,6 +172,19 @@ ALTER TABLE `brand_type`
   ADD KEY `brand_id` (`brand_id`);
 
 --
+-- Chỉ mục cho bảng `inbox_messages`
+--
+ALTER TABLE `inbox_messages`
+  ADD PRIMARY KEY (`event_id`);
+
+--
+-- Chỉ mục cho bảng `outbox_messages`
+--
+ALTER TABLE `outbox_messages`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `event_id` (`event_id`);
+
+--
 -- Chỉ mục cho bảng `products`
 --
 ALTER TABLE `products`
@@ -168,6 +207,12 @@ ALTER TABLE `product_types`
 --
 ALTER TABLE `brands`
   MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT cho bảng `outbox_messages`
+--
+ALTER TABLE `outbox_messages`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT cho bảng `products`

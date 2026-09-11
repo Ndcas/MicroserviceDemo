@@ -1,32 +1,39 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.Primitives;
-using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Gateway.Constants;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Primitives;
+using Microsoft.IdentityModel.Tokens;
 using Yarp.ReverseProxy.Transforms;
 
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
-const string CORS_POLICY = "MicroserviceDemoCORS";
-
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
-string frontendUrl = builder.Configuration.GetValue<string>("FrontendUrl")!;
-string jwtKey = builder.Configuration.GetValue<string>("JWT:Key")!;
-string issuer = builder.Configuration.GetValue<string>("JWT:Issuer")!;
-string audience = builder.Configuration.GetValue<string>("JWT:Audience")!;
+
+var frontendUrl = builder.Configuration.GetValue<string>(EnvironmentVariableKeys.FrontEndUrl)!;
+var jwtKey = builder.Configuration.GetValue<string>(EnvironmentVariableKeys.JwtKey)!;
+var issuer = builder.Configuration.GetValue<string>(EnvironmentVariableKeys.JwtIssuer)!;
+var audience = builder.Configuration.GetValue<string>(EnvironmentVariableKeys.JwtAudience)!;
 
 builder.Services.AddControllers();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(name: CORS_POLICY, policy =>
+    options.AddPolicy(name: CorsConfigurations.PolicyName, policy =>
     {
-        policy.WithOrigins(frontendUrl).AllowAnyHeader().AllowAnyMethod().AllowCredentials();
+        policy
+            .WithOrigins(frontendUrl)
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
 
-builder.Services.AddReverseProxy().LoadFromConfig(builder.Configuration.GetSection("ReverseProxy")).AddTransforms(builderContext =>
+builder.Services
+    .AddReverseProxy()
+    .LoadFromConfig(builder.Configuration.GetSection(EnvironmentVariableKeys.ReverseProxySection))
+    .AddTransforms(builderContext =>
 {
     builderContext.AddRequestTransform(transformContext =>
     {
@@ -34,16 +41,23 @@ builder.Services.AddReverseProxy().LoadFromConfig(builder.Configuration.GetSecti
 
         if (user.Identity?.IsAuthenticated == true)
         {
-            string userId = user.FindFirstValue("sub")!;
-            string name = user.FindFirstValue("name")!;
-            string roleId = user.FindFirstValue("role")!;
-            string ip = transformContext.HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+            string userId = user.FindFirstValue(JwtConfigurations.ClaimTypeUserId)!;
+            string name = user.FindFirstValue(JwtConfigurations.ClaimTypeName)!;
+            string roleId = user.FindFirstValue(JwtConfigurations.ClaimTypeRoleId)!;
 
-            transformContext.ProxyRequest.Headers.Add("X-User-Id", userId);
+            transformContext.ProxyRequest.Headers.Add(ReverseProxyConfigurations.UserIdHeaderName, userId);
 
-            transformContext.ProxyRequest.Headers.Add("X-User-Name", name);
+            transformContext.ProxyRequest.Headers.Add(ReverseProxyConfigurations.UserNameHeaderName, name);
 
-            transformContext.ProxyRequest.Headers.Add("X-User-Role", roleId);
+            transformContext.ProxyRequest.Headers.Add(ReverseProxyConfigurations.UserRoleIdHeaderName, roleId);
+        }
+        else
+        {
+            transformContext.ProxyRequest.Headers.Remove(ReverseProxyConfigurations.UserIdHeaderName);
+
+            transformContext.ProxyRequest.Headers.Remove(ReverseProxyConfigurations.UserNameHeaderName);
+
+            transformContext.ProxyRequest.Headers.Remove(ReverseProxyConfigurations.UserRoleIdHeaderName);
         }
 
         if (transformContext.HttpContext.Request.Headers.TryGetValue("X-Forwarded-For", out StringValues forwardedFor))
@@ -52,17 +66,18 @@ builder.Services.AddReverseProxy().LoadFromConfig(builder.Configuration.GetSecti
 
             if (ips.Length > 0)
             {
-                transformContext.ProxyRequest.Headers.Add("X-Ip", ips[0].Trim());
+                transformContext.ProxyRequest.Headers.Add(ReverseProxyConfigurations.UserIpAddressHeaderName, ips[0].Trim());
             }
         }
         else
         {
-            string ip = transformContext.HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Không rõ";
+            string ip = transformContext.HttpContext.Connection.RemoteIpAddress?.ToString() ??
+                ReverseProxyConfigurations.UnknownIpAddressValue;
 
-            transformContext.ProxyRequest.Headers.Add("X-Ip", ip);
+            transformContext.ProxyRequest.Headers.Add(ReverseProxyConfigurations.UserIpAddressHeaderName, ip);
         }
 
-        transformContext.ProxyRequest.Headers.Add("X-Correlation-Id", Guid.NewGuid().ToString());
+        transformContext.ProxyRequest.Headers.Add(ReverseProxyConfigurations.CorrelationIdHeaderName, Guid.NewGuid().ToString());
 
         return ValueTask.CompletedTask;
     });
@@ -82,14 +97,18 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         ValidAudience = audience,
         ValidateLifetime = true,
         ClockSkew = TimeSpan.Zero,
-        NameClaimType = "name",
-        RoleClaimType = "role"
+        NameClaimType = JwtConfigurations.ClaimTypeName,
+        RoleClaimType = JwtConfigurations.ClaimTypeRoleId
     };
 });
 
 var app = builder.Build();
 
-app.UseCors(CORS_POLICY);
+app.UseWebSockets();
+
+app.UseRouting();
+
+app.UseCors(CorsConfigurations.PolicyName);
 
 app.UseAuthentication();
 

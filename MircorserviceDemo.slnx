@@ -1,0 +1,31 @@
+<Solution>
+  <Folder Name="/Backend/">
+    <Project Path="Backend/Gateway/Gateway.csproj" />
+  </Folder>
+  <Folder Name="/Backend/Microservices/" />
+  <Folder Name="/Backend/Microservices/LogService/">
+    <Project Path="Backend/Microservices/LogService/LogService.Api/LogService.Api.csproj" />
+    <Project Path="Backend/Microservices/LogService/LogService.Application/LogService.Application.csproj" />
+    <Project Path="Backend/Microservices/LogService/LogService.Domain/LogService.Domain.csproj" />
+    <Project Path="Backend/Microservices/LogService/LogService.Infrastructure/LogService.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/Backend/Microservices/OrderService/">
+    <Project Path="Backend/Microservices/OrderService/OrderService.Api/OrderService.Api.csproj" />
+    <Project Path="Backend/Microservices/OrderService/OrderService.Application/OrderService.Application.csproj" />
+    <Project Path="Backend/Microservices/OrderService/OrderService.Domain/OrderService.Domain.csproj" />
+    <Project Path="Backend/Microservices/OrderService/OrderService.Infrastructure/OrderService.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/Backend/Microservices/ProductService/">
+    <Project Path="Backend/Microservices/ProductService/ProductService.Api/ProductService.Api.csproj" />
+    <Project Path="Backend/Microservices/ProductService/ProductService.Application/ProductService.Application.csproj" />
+    <Project Path="Backend/Microservices/ProductService/ProductService.Domain/ProductService.Domain.csproj" />
+    <Project Path="Backend/Microservices/ProductService/ProductService.Infrastructure/ProductService.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/Backend/Microservices/UserService/">
+    <Project Path="Backend/Microservices/UserService/UserService.Api/UserService.Api.csproj" />
+    <Project Path="Backend/Microservices/UserService/UserService.Application/UserService.Application.csproj" />
+    <Project Path="Backend/Microservices/UserService/UserService.Domain/UserService.Domain.csproj" />
+    <Project Path="Backend/Microservices/UserService/UserService.Infrastructure/UserService.Infrastructure.csproj" />
+  </Folder>
+  <Project Path="Frontend/Frontend.csproj" />
+</Solution>

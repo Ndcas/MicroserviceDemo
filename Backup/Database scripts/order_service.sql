@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: mysql
--- Thời gian đã tạo: Th8 27, 2026 lúc 03:57 PM
+-- Thời gian đã tạo: Th9 11, 2026 lúc 03:52 AM
 -- Phiên bản máy phục vụ: 9.7.1
 -- Phiên bản PHP: 8.3.32
 
@@ -24,13 +24,24 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Cấu trúc bảng cho bảng `inbox_messages`
+--
+
+CREATE TABLE `inbox_messages` (
+  `event_id` char(36) NOT NULL,
+  `processed_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Cấu trúc bảng cho bảng `orders`
 --
 
 CREATE TABLE `orders` (
   `id` int NOT NULL,
   `user_id` int NOT NULL,
-  `status` enum('UNPAID','CONFIRMED','FINISHED','CANCELED') NOT NULL DEFAULT 'UNPAID',
+  `status` enum('PROCESSING','UNPAID','CONFIRMED','FINISHED','CANCELED') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'PROCESSING',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -47,6 +58,21 @@ CREATE TABLE `order_details` (
   `price_at_booking` decimal(10,2) NOT NULL,
   `quantity` int NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `outbox_messages`
+--
+
+CREATE TABLE `outbox_messages` (
+  `id` int NOT NULL,
+  `event_id` char(36) NOT NULL,
+  `topic` varchar(255) NOT NULL,
+  `payload` text NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `published_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
@@ -70,6 +96,12 @@ CREATE TABLE `transactions` (
 --
 
 --
+-- Chỉ mục cho bảng `inbox_messages`
+--
+ALTER TABLE `inbox_messages`
+  ADD PRIMARY KEY (`event_id`);
+
+--
 -- Chỉ mục cho bảng `orders`
 --
 ALTER TABLE `orders`
@@ -80,6 +112,13 @@ ALTER TABLE `orders`
 --
 ALTER TABLE `order_details`
   ADD PRIMARY KEY (`order_id`,`product_id`);
+
+--
+-- Chỉ mục cho bảng `outbox_messages`
+--
+ALTER TABLE `outbox_messages`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `event_id` (`event_id`);
 
 --
 -- Chỉ mục cho bảng `transactions`
@@ -96,6 +135,12 @@ ALTER TABLE `transactions`
 -- AUTO_INCREMENT cho bảng `orders`
 --
 ALTER TABLE `orders`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT cho bảng `outbox_messages`
+--
+ALTER TABLE `outbox_messages`
   MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --

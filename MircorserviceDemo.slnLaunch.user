@@ -3,16 +3,24 @@
     "Name": "Default",
     "Projects": [
       {
-        "Path": "Backend\\gateway\\gateway.csproj",
-        "Action": "Start"
+        "Path": "Backend\\gateway\\Gateway.csproj",
+        "Action": "Start",
+        "DebugTarget": "http"
       },
       {
-        "Path": "Backend\\services\\user\\user.csproj",
-        "Action": "Start"
+        "Path": "Backend\\Microservices\\LogService\\LogService.Api\\LogService.Api.csproj",
+        "Action": "Start",
+        "DebugTarget": "http"
       },
       {
-        "Path": "Backend\\services\\log\\log.csproj",
-        "Action": "Start"
+        "Path": "Frontend\\Frontend.csproj",
+        "Action": "Start",
+        "DebugTarget": "http"
+      },
+      {
+        "Path": "Backend\\Microservices\\UserService\\UserService.Api\\UserService.Api.csproj",
+        "Action": "Start",
+        "DebugTarget": "http"
       }
     ]
   }
