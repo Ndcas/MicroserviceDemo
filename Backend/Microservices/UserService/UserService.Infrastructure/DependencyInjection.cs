@@ -29,7 +29,10 @@ public static class DependencyInjection
 
         services.AddScoped<IAccountRepository, AccountRepository>();
 
-        services.AddSingleton<IPulsarClient>(sp => PulsarClient.Builder().ServiceUrl(new Uri(pulsarConnectionString)).Build());
+        services.AddSingleton<IPulsarClient>(sp => PulsarClient
+            .Builder()
+            .ServiceUrl(new Uri(pulsarConnectionString))
+            .Build());
 
         services.AddSingleton<ILogProducer, LogProducer>();
 

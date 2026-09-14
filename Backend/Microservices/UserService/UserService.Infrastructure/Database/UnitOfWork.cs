@@ -6,6 +6,7 @@ namespace UserService.Infrastructure.Database;
 public class UnitOfWork : IUnitOfWork
 {
     private readonly UserServiceContext _context;
+
     private IDbContextTransaction? _transaction;
 
     public UnitOfWork(UserServiceContext context)
@@ -15,7 +16,7 @@ public class UnitOfWork : IUnitOfWork
 
     public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
     {
-        if (_transaction != null)
+        if (_transaction is not null)
         {
             return;
         }
@@ -25,7 +26,7 @@ public class UnitOfWork : IUnitOfWork
 
     public async Task RollbackTransactionAsync(CancellationToken cancellationToken = default)
     {
-        if (_transaction == null)
+        if (_transaction is null)
         {
             return;
         }
@@ -41,7 +42,7 @@ public class UnitOfWork : IUnitOfWork
         {
             await _context.SaveChangesAsync(cancellationToken);
 
-            if (_transaction != null)
+            if (_transaction is not null)
             {
                 await _transaction.CommitAsync(cancellationToken);
             }
@@ -54,7 +55,7 @@ public class UnitOfWork : IUnitOfWork
         }
         finally
         {
-            if (_transaction != null)
+            if (_transaction is not null)
             {
                 await _transaction.DisposeAsync();
 
@@ -63,8 +64,11 @@ public class UnitOfWork : IUnitOfWork
         }
     }
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
-        _transaction?.Dispose();
+        if (_transaction is not null)
+        {
+            await _transaction.DisposeAsync();
+        }
     }
 }

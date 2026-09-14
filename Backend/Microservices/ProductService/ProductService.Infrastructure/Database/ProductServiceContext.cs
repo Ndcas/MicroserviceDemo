@@ -134,6 +134,10 @@ public partial class ProductServiceContext : DbContext
 
             entity.Property(e => e.ProductTypeId).HasColumnName("product_type_id");
 
+            entity.Property(e => e.Reserved).HasColumnName("reserved");
+
+            entity.Property(e => e.Stocks).HasColumnName("stocks");
+
             entity
                 .Property(e => e.UpdatedAt)
                 .ValueGeneratedOnAddOrUpdate()
@@ -170,7 +174,8 @@ public partial class ProductServiceContext : DbContext
                 .HasColumnType("timestamp")
                 .HasColumnName("created_at");
 
-            entity.Property(e => e.Name)
+            entity
+                .Property(e => e.Name)
                 .HasMaxLength(255)
                 .HasColumnName("name");
 

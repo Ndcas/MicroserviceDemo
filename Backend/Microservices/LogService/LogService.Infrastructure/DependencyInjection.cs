@@ -21,7 +21,10 @@ namespace LogService.Infrastructure
             services.AddDbContext<LogServiceContext>(option =>
                 option.UseMySql(databaseConnectionString, ServerVersion.AutoDetect(databaseConnectionString)));
 
-            services.AddSingleton<IPulsarClient>(sp => PulsarClient.Builder().ServiceUrl(new Uri(pulsarConnectionString)).Build());
+            services.AddSingleton<IPulsarClient>(sp => PulsarClient
+                .Builder()
+                .ServiceUrl(new Uri(pulsarConnectionString))
+                .Build());
 
             services.AddScoped<ILogRepository, LogRepository>();
 

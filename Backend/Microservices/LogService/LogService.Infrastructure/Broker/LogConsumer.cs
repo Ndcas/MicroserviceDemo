@@ -35,7 +35,7 @@ public class LogConsumer : BackgroundService
             .Topic(topic)
             .Create();
 
-        await foreach (IMessage<string> message in consumer.Messages(stoppingToken))
+        await foreach (var message in consumer.Messages(stoppingToken))
         {
             try
             {

@@ -10,6 +10,7 @@ namespace UserService.Api.Controllers;
 public class UserController : ControllerBase
 {
     private const string _refreshTokenCookieName = "refreshToken";
+    private const string _logSource = "UserService-UserController";
 
     private readonly IAccountService _accountService;
     private readonly IConfiguration _configuration;
@@ -33,7 +34,6 @@ public class UserController : ControllerBase
             if (!response.Ok)
             {
                 await SendLogAsync(
-                    Request,
                     $"Xử lý đăng nhập thất bại: {response.Error}",
                     Constants.LogLevel.Warning,
                     cancellationToken);
@@ -54,7 +54,6 @@ public class UserController : ControllerBase
             Response.Cookies.Append(_refreshTokenCookieName, response.Data.RefreshToken, cookieOptions);
 
             await SendLogAsync(
-                Request,
                 "Xử lý đăng nhập thành công",
                 Constants.LogLevel.Information,
                 cancellationToken);
@@ -67,7 +66,6 @@ public class UserController : ControllerBase
         catch (Exception ex)
         {
             await SendLogAsync(
-                Request,
                 $"Xử lý đăng nhập thất bại: {ex}",
                 Constants.LogLevel.Error,
                 cancellationToken);
@@ -93,7 +91,6 @@ public class UserController : ControllerBase
             if (!response.Ok)
             {
                 await SendLogAsync(
-                    Request,
                     $"Xử lý làm mới access token thất bại: {response.Error}",
                     Constants.LogLevel.Warning,
                     cancellationToken);
@@ -102,7 +99,6 @@ public class UserController : ControllerBase
             }
 
             await SendLogAsync(
-                Request,
                 "Xử lý làm mới access token thành công",
                 Constants.LogLevel.Information,
                 cancellationToken);
@@ -115,7 +111,6 @@ public class UserController : ControllerBase
         catch (Exception ex)
         {
             await SendLogAsync(
-                Request,
                 $"Xử lý làm mới access token thất bại: {ex}",
                 Constants.LogLevel.Error,
                 cancellationToken);
@@ -143,7 +138,6 @@ public class UserController : ControllerBase
             if (!response.Ok)
             {
                 await SendLogAsync(
-                    Request,
                     $"Xử lý đăng xuất thất bại: {response.Error}",
                     Constants.LogLevel.Warning,
                     cancellationToken);
@@ -152,7 +146,6 @@ public class UserController : ControllerBase
             }
 
             await SendLogAsync(
-                Request,
                 "Xử lý đăng xuất thành công",
                 Constants.LogLevel.Information,
                 cancellationToken);
@@ -163,7 +156,6 @@ public class UserController : ControllerBase
         catch (Exception ex)
         {
             await SendLogAsync(
-                Request,
                 $"Xử lý đăng xuất thất bại: {ex}",
                 Constants.LogLevel.Error,
                 cancellationToken);
@@ -173,20 +165,19 @@ public class UserController : ControllerBase
     }
 
     private async Task SendLogAsync(
-        HttpRequest request,
         string content,
         Constants.LogLevel level = Constants.LogLevel.Information,
         CancellationToken cancellationToken = default)
     {
-        var correlationId = request.Headers[ProxyHeaders.CorrelationId];
-        var ip = request.Headers[ProxyHeaders.Ip];
+        var correlationId = Request.Headers[ProxyHeaders.CorrelationId];
+        var ip = Request.Headers[ProxyHeaders.Ip];
 
         var message = new LogMessage(
             nameof(level),
-            "UserService-UserController",
+            _logSource,
             correlationId,
             ip,
-            DateTime.Now.ToString(),
+            DateTime.UtcNow.ToString(),
             content);
 
         await _logProducer.SendAsync(message, cancellationToken);

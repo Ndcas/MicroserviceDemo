@@ -12,7 +12,7 @@ public record ServiceResponse<T>(
     string? Message,
     string? Error,
     T? Data) : ServiceResponse(
-        Ok, 
-        Status, 
-        Message, 
-        Error);
+    Ok,
+    Status,
+    Message,
+    Error);

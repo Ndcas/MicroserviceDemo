@@ -15,7 +15,7 @@ public class LogProducer : ILogProducer
 
     public LogProducer(IPulsarClient client, IConfiguration configuration)
     {
-        var logTopic = configuration[EnvironmentVariableKeys.BrokerLogTopic];
+        var logTopic = configuration[EnvironmentVariableKeys.BrokerLogSentTopic];
 
         _producer = client.NewProducer(Schema.String).Topic(logTopic).Create();
     }

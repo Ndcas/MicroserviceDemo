@@ -21,6 +21,11 @@
         "Path": "Backend\\Microservices\\UserService\\UserService.Api\\UserService.Api.csproj",
         "Action": "Start",
         "DebugTarget": "http"
+      },
+      {
+        "Path": "Backend\\Microservices\\ProductService\\ProductService.Api\\ProductService.Api.csproj",
+        "Action": "Start",
+        "DebugTarget": "http"
       }
     ]
   }

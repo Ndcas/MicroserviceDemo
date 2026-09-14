@@ -104,8 +104,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 
 var app = builder.Build();
 
-app.UseWebSockets();
-
 app.UseRouting();
 
 app.UseCors(CorsConfigurations.PolicyName);

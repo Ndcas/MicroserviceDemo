@@ -13,4 +13,9 @@ public partial class OutboxMessage
     public DateTime CreatedAt { get; set; }
 
     public DateTime? PublishedAt { get; set; }
+
+    public void UpdatePublishedTime()
+    {
+        PublishedAt = DateTime.UtcNow;
+    }
 }

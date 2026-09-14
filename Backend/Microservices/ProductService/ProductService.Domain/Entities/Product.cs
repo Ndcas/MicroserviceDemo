@@ -18,7 +18,34 @@ public partial class Product
 
     public DateTime UpdatedAt { get; set; }
 
+    public int Stocks { get; set; }
+
+    public int Reserved { get; set; }
+
     public virtual Brand Brand { get; set; } = null!;
 
     public virtual ProductType ProductType { get; set; } = null!;
+
+    public bool IsReservable(int quantity) => Stocks - Reserved - quantity >= 0;
+
+    public void Reserve(int quantity)
+    {
+        if (!IsReservable(quantity))
+        {
+            throw new InvalidOperationException();
+        }
+
+        Reserved += quantity;
+    }
+
+    public void SubstractPaidStocks(int quantity)
+    {
+        if (Stocks - quantity < 0 || Reserved - quantity < 0)
+        {
+            throw new InvalidOperationException();
+        }
+
+        Stocks -= quantity;
+        Reserved -= quantity;
+    }
 }
