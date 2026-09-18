@@ -1,6 +1,6 @@
 ﻿namespace Gateway.Constants;
 
-public static class EnvironmentVariableKeys
+internal static class EnvironmentVariableKeys
 {
     public const string FrontEndUrl = "FrontendUrl";
     public const string JwtKey = "JWT:Key";

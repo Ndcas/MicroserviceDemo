@@ -4,7 +4,7 @@ using UserService.Application.Interfaces;
 
 namespace UserService.Infrastructure.Cache;
 
-public class CacheService : ICacheService
+internal class CacheService : ICacheService
 {
     private IDatabase _database;
 

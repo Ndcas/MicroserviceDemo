@@ -9,9 +9,9 @@ using UserService.Infrastructure.Constants;
 
 namespace UserService.Infrastructure.Broker;
 
-public class LogProducer : ILogProducer
+internal class LogProducer : ILogProducer
 {
-    private IProducer<string> _producer;
+    private readonly IProducer<string> _producer;
 
     public LogProducer(IPulsarClient client, IConfiguration configuration)
     {
@@ -27,8 +27,8 @@ public class LogProducer : ILogProducer
         await _producer.NewMessage().Send(jsonContent, cancellationToken);
     }
 
-    public ValueTask DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
-        return _producer.DisposeAsync();
+        await _producer.DisposeAsync();
     }
 }

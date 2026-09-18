@@ -6,7 +6,7 @@ using ProductService.Api.Constants;
 
 namespace ProductService.Api.Authentication;
 
-public class ProxyAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
+internal class ProxyAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
     public const string SchemeName = "ProxyHeaderAuthentication";
 

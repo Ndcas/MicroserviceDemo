@@ -1,4 +1,6 @@
-﻿namespace OrderService.Domain.Entities;
+﻿using OrderService.Domain.Constants;
+
+namespace OrderService.Domain.Entities;
 
 public partial class Transaction
 {
@@ -17,4 +19,32 @@ public partial class Transaction
     public DateTime UpdatedAt { get; set; }
 
     public virtual Order Order { get; set; } = null!;
+
+    public bool IsPending
+    {
+        get
+        {
+            return Status is null;
+        }
+    }
+
+    public void ConfirmSuccess()
+    {
+        if (!IsPending)
+        {
+            throw new InvalidOperationException();
+        }
+
+        Status = TransactionStatuses.Success;
+    }
+
+    public void ConfirmFail()
+    {
+        if (!IsPending)
+        {
+            throw new InvalidOperationException();
+        }
+
+        Status = TransactionStatuses.Fail;
+    }
 }

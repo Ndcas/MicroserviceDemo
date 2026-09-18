@@ -1,6 +1,6 @@
 ﻿namespace ProductService.Infrastructure.Constants;
 
-public class BrokerEventConfigurations
+internal static class BrokerEventConfigurations
 {
     public const string EventIdProperyKey = "X-Event-Id";
 }

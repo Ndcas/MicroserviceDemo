@@ -26,7 +26,10 @@ public partial class Product
 
     public virtual ProductType ProductType { get; set; } = null!;
 
-    public bool IsReservable(int quantity) => Stocks - Reserved - quantity >= 0;
+    public bool IsReservable(int quantity)
+    {
+        return Stocks - Reserved - quantity >= 0;
+    }
 
     public void Reserve(int quantity)
     {
@@ -46,6 +49,11 @@ public partial class Product
         }
 
         Stocks -= quantity;
+        Reserved -= quantity;
+    }
+
+    public void Unreserve(int quantity)
+    {
         Reserved -= quantity;
     }
 }

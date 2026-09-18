@@ -3,7 +3,7 @@ using LogService.Domain.Interfaces;
 
 namespace LogService.Infrastructure.Database.Repositories;
 
-public class LogRepository : ILogRepository
+internal class LogRepository : ILogRepository
 {
     private readonly LogServiceContext _context;
 

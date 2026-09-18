@@ -3,7 +3,7 @@ using UserService.Application.Interfaces;
 
 namespace UserService.Infrastructure.Database;
 
-public class UnitOfWork : IUnitOfWork
+internal class UnitOfWork : IUnitOfWork
 {
     private readonly UserServiceContext _context;
 

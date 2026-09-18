@@ -6,7 +6,7 @@ using UserService.Api.Constants;
 
 namespace UserService.Api.Authentication;
 
-public class ProxyAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
+internal class ProxyAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
     public const string SchemeName = "ProxyHeaderAuthentication";
 
@@ -29,7 +29,6 @@ public class ProxyAuthenticationHandler : AuthenticationHandler<AuthenticationSc
             new Claim(JwtConfigurations.ClaimTypeUserId, userId),
             new Claim(JwtConfigurations.ClaimTypeName, name),
             new Claim(JwtConfigurations.ClaimTypeRoleId, roleId)
-
         };
 
         var identity = new ClaimsIdentity(claims, Scheme.Name, JwtConfigurations.ClaimTypeName, JwtConfigurations.ClaimTypeRoleId);

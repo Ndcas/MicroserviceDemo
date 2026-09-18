@@ -1,6 +1,6 @@
 ﻿namespace UserService.Api.Constants;
 
-public static class EnvironmentVariableKeys
+internal static class EnvironmentVariableKeys
 {
     public const string JwtRefreshTokenExpireDays = "Jwt:RefreshTokenExpireDays";
 }

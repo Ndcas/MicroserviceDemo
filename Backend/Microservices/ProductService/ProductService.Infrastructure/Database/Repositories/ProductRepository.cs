@@ -1,12 +1,10 @@
-﻿using System.Text;
-using Microsoft.EntityFrameworkCore;
-using ProductService.Application.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
 using ProductService.Domain.Entities;
 using ProductService.Domain.Interfaces;
 
 namespace ProductService.Infrastructure.Database.Repositories;
 
-public class ProductRepository : IProductRepository
+internal class ProductRepository : IProductRepository
 {
     private readonly ProductServiceContext _context;
 

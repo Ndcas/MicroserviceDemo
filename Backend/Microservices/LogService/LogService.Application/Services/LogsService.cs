@@ -6,7 +6,7 @@ using LogService.Domain.Interfaces;
 
 namespace LogService.Application.Services;
 
-public class LogsService : ILogsService
+internal class LogsService : ILogsService
 {
     private readonly ILogRepository _logRepository;
 

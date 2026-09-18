@@ -1,6 +1,6 @@
 ﻿namespace Gateway.Constants;
 
-public static class ReverseProxyConfigurations
+internal static class ReverseProxyConfigurations
 {
     public const string UnknownIpAddressValue = "Unknown";
     public const string UserIdHeaderName = "X-User-Id";

@@ -3,7 +3,7 @@ using UserService.Domain.Entities;
 
 namespace UserService.Infrastructure.Database;
 
-public partial class UserServiceContext : DbContext
+internal partial class UserServiceContext : DbContext
 {
     public UserServiceContext() { }
 

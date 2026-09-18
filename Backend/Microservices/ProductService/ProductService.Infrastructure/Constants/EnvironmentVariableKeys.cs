@@ -1,6 +1,6 @@
 ﻿namespace ProductService.Infrastructure.Constants;
 
-public static class EnvironmentVariableKeys
+internal static class EnvironmentVariableKeys
 {
     public const string DatabaseConnectionString = "DefaultConnection";
     public const string PulsarConnectionString = "Pulsar";

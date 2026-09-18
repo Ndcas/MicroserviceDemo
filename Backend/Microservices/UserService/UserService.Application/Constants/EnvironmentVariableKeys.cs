@@ -1,6 +1,6 @@
 ﻿namespace UserService.Application.Constants;
 
-public static class EnvironmentVariableKeys
+internal static class EnvironmentVariableKeys
 {
     public const string JwtKey = "JWT:Key";
     public const string JwtIssuer = "JWT:Issuer";

@@ -4,7 +4,7 @@ using UserService.Domain.Interfaces;
 
 namespace UserService.Infrastructure.Database.Repositories;
 
-public class AccountRepository : IAccountRepository
+internal class AccountRepository : IAccountRepository
 {
     private readonly UserServiceContext _context;
 

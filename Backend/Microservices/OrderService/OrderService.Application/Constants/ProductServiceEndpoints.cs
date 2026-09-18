@@ -1,0 +1,6 @@
+﻿namespace OrderService.Application.Constants;
+
+internal static class ProductServiceEndpoints
+{
+    public const string GetProductPrice = "Price";
+}

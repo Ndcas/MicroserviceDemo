@@ -9,7 +9,7 @@ using ProductService.Infrastructure.Constants;
 
 namespace ProductService.Infrastructure.Broker;
 
-public class ReservationEventProducer : IReservationEventProducer
+internal class ReservationEventProducer : IReservationEventProducer
 {
     private IProducer<string> _succeededProducer;
     private IProducer<string> _failedProducer;
@@ -23,17 +23,41 @@ public class ReservationEventProducer : IReservationEventProducer
         _failedProducer = pulsarClient.NewProducer(Schema.String).Topic(reservationFailedTopic).Create();
     }
 
-    public async Task NotifyReservationFailedAsync(ReservationEventMessage message, CancellationToken cancellationToken = default)
+    public async Task NotifyReservationFailedAsync(
+        Guid eventId,
+        OrderIdMessage message,
+        CancellationToken cancellationToken = default)
     {
         var jsonContent = JsonSerializer.Serialize(message);
 
-        await _succeededProducer.NewMessage().Send(jsonContent, cancellationToken);
+        await _succeededProducer
+            .NewMessage()
+            .Property(BrokerEventConfigurations.EventIdProperyKey, eventId.ToString())
+            .Send(jsonContent, cancellationToken);
     }
 
-    public async Task NotifyReservationSucceededAsync(ReservationEventMessage message, CancellationToken cancellationToken = default)
+    public async Task NotifyReservationSucceededAsync(
+        Guid eventId,
+        OrderIdMessage message,
+        CancellationToken cancellationToken = default)
     {
         var jsonContent = JsonSerializer.Serialize(message);
 
-        await _failedProducer.NewMessage().Send(jsonContent, cancellationToken);
+        await _failedProducer
+            .NewMessage()
+            .Property(BrokerEventConfigurations.EventIdProperyKey, eventId.ToString())
+            .Send(jsonContent, cancellationToken);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        try
+        {
+            await _succeededProducer.DisposeAsync();
+        }
+        finally
+        {
+            await _failedProducer.DisposeAsync();
+        }
     }
 }

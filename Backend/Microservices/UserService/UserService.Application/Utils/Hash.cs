@@ -3,7 +3,7 @@ using System.Text;
 
 namespace UserService.Application.Utils;
 
-public static class Hash
+internal static class Hash
 {
     public static string GenerateHash(string input)
     {

@@ -3,7 +3,7 @@ using ProductService.Application.Interfaces;
 
 namespace ProductService.Infrastructure.Database;
 
-public class UnitOfWork : IUnitOfWork
+internal class UnitOfWork : IUnitOfWork
 {
     private readonly ProductServiceContext _context;
 

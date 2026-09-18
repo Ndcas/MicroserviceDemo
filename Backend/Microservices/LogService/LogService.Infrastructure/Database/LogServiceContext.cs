@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LogService.Infrastructure.Database;
 
-public partial class LogServiceContext : DbContext
+internal partial class LogServiceContext : DbContext
 {
     public LogServiceContext() { }
 

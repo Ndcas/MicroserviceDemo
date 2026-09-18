@@ -1,6 +1,6 @@
 ﻿namespace UserService.Api.Constants;
 
-public enum LogLevel
+internal enum LogLevel
 {
     Information = 1,
     Warning = 2,

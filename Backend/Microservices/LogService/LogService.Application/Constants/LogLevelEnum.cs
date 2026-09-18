@@ -1,6 +1,6 @@
 ﻿namespace LogService.Application.Constants;
 
-public enum LogLevelEnum
+internal enum LogLevelEnum
 {
     Information = 1,
     Warning = 2,

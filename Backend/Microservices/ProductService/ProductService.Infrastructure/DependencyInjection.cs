@@ -10,7 +10,6 @@ using ProductService.Infrastructure.ChangeTracker;
 using ProductService.Infrastructure.Constants;
 using ProductService.Infrastructure.Database;
 using ProductService.Infrastructure.Database.Repositories;
-using UserService.Infrastructure.Broker;
 
 namespace ProductService.Infrastructure;
 
@@ -40,6 +39,10 @@ public static class DependencyInjection
         services.AddScoped<IReservationEventProducer, ReservationEventProducer>();
 
         services.AddHostedService<OutboxMessageTracker>();
+
+        services.AddHostedService<OrderCreationConsumer>();
+
+        services.AddHostedService<PaymentCompletionConsumer>();
 
         return services;
     }

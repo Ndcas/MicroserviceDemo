@@ -4,7 +4,7 @@ using ProductService.Domain.Interfaces;
 
 namespace ProductService.Infrastructure.Database.Repositories;
 
-public class MessageRepository : IMessageRepository
+internal class MessageRepository : IMessageRepository
 {
     private readonly ProductServiceContext _context;
 

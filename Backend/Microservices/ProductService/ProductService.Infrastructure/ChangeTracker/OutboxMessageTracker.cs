@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -6,7 +6,7 @@ using ProductService.Application.Interfaces;
 
 namespace ProductService.Infrastructure.ChangeTracker;
 
-public class OutboxMessageTracker : BackgroundService
+internal class OutboxMessageTracker : BackgroundService
 {
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly ILogger<OutboxMessageTracker> _logger;
@@ -29,7 +29,7 @@ public class OutboxMessageTracker : BackgroundService
         {
             try
             {
-                using var scope = _serviceScopeFactory.CreateScope();
+                await using var scope = _serviceScopeFactory.CreateAsyncScope();
 
                 var messageService = scope.ServiceProvider.GetRequiredService<IMessageService>();
 
@@ -42,7 +42,7 @@ public class OutboxMessageTracker : BackgroundService
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.ToString());
+                _logger.LogError(ex.Message);
             }
         }
     }

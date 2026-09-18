@@ -3,7 +3,7 @@ using ProductService.Domain.Entities;
 
 namespace ProductService.Infrastructure.Database;
 
-public partial class ProductServiceContext : DbContext
+internal partial class ProductServiceContext : DbContext
 {
     public ProductServiceContext() { }
 

@@ -5,7 +5,7 @@ using UserService.Application.Interfaces;
 
 namespace UserService.Api.Controllers;
 
-[Route("/")]
+[Route("User")]
 [ApiController]
 public class UserController : ControllerBase
 {
@@ -33,17 +33,14 @@ public class UserController : ControllerBase
 
             if (!response.Ok)
             {
-                await SendLogAsync(
-                    $"Xử lý đăng nhập thất bại: {response.Error}",
-                    Constants.LogLevel.Warning,
-                    cancellationToken);
+                await SendLogAsync(response.Error, Constants.LogLevel.Warning, cancellationToken);
 
                 return StatusCode(response.Status, response.Error);
             }
 
-            int refreshTokenExpireDays = _configuration.GetValue<int>(EnvironmentVariableKeys.JwtRefreshTokenExpireDays);
+            var refreshTokenExpireDays = _configuration.GetValue<int>(EnvironmentVariableKeys.JwtRefreshTokenExpireDays);
 
-            CookieOptions cookieOptions = new CookieOptions
+            var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
                 Secure = true,
@@ -53,11 +50,6 @@ public class UserController : ControllerBase
 
             Response.Cookies.Append(_refreshTokenCookieName, response.Data.RefreshToken, cookieOptions);
 
-            await SendLogAsync(
-                "Xử lý đăng nhập thành công",
-                Constants.LogLevel.Information,
-                cancellationToken);
-
             return StatusCode(response.Status, new
             {
                 accessToken = response.Data.AccessToken,
@@ -65,10 +57,7 @@ public class UserController : ControllerBase
         }
         catch (Exception ex)
         {
-            await SendLogAsync(
-                $"Xử lý đăng nhập thất bại: {ex}",
-                Constants.LogLevel.Error,
-                cancellationToken);
+            await SendLogAsync(ex.Message, Constants.LogLevel.Error, cancellationToken);
 
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
@@ -83,25 +72,17 @@ public class UserController : ControllerBase
 
             if (string.IsNullOrEmpty(refreshToken))
             {
-                return StatusCode(StatusCodes.Status400BadRequest, "Không tìm thấy refresh token");
+                return StatusCode(StatusCodes.Status400BadRequest);
             }
 
             var response = await _accountService.RefreshAsync(refreshToken, cancellationToken);
 
             if (!response.Ok)
             {
-                await SendLogAsync(
-                    $"Xử lý làm mới access token thất bại: {response.Error}",
-                    Constants.LogLevel.Warning,
-                    cancellationToken);
+                await SendLogAsync(response.Error, Constants.LogLevel.Warning, cancellationToken);
 
                 return StatusCode(response.Status, response.Error);
             }
-
-            await SendLogAsync(
-                "Xử lý làm mới access token thành công",
-                Constants.LogLevel.Information,
-                cancellationToken);
 
             return StatusCode(response.Status, new
             {
@@ -110,10 +91,7 @@ public class UserController : ControllerBase
         }
         catch (Exception ex)
         {
-            await SendLogAsync(
-                $"Xử lý làm mới access token thất bại: {ex}",
-                Constants.LogLevel.Error,
-                cancellationToken);
+            await SendLogAsync(ex.Message, Constants.LogLevel.Error, cancellationToken);
 
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
@@ -128,7 +106,7 @@ public class UserController : ControllerBase
 
             if (string.IsNullOrEmpty(refreshToken))
             {
-                return StatusCode(StatusCodes.Status400BadRequest, "Không tìm thấy refresh token");
+                return StatusCode(StatusCodes.Status400BadRequest);
             }
 
             Response.Cookies.Delete(_refreshTokenCookieName);
@@ -137,28 +115,17 @@ public class UserController : ControllerBase
 
             if (!response.Ok)
             {
-                await SendLogAsync(
-                    $"Xử lý đăng xuất thất bại: {response.Error}",
-                    Constants.LogLevel.Warning,
-                    cancellationToken);
+                await SendLogAsync(response.Error, Constants.LogLevel.Warning, cancellationToken);
 
                 return StatusCode(response.Status, response.Error);
             }
-
-            await SendLogAsync(
-                "Xử lý đăng xuất thành công",
-                Constants.LogLevel.Information,
-                cancellationToken);
 
             return StatusCode(StatusCodes.Status200OK);
 
         }
         catch (Exception ex)
         {
-            await SendLogAsync(
-                $"Xử lý đăng xuất thất bại: {ex}",
-                Constants.LogLevel.Error,
-                cancellationToken);
+            await SendLogAsync(ex.Message, Constants.LogLevel.Error, cancellationToken);
 
             return StatusCode(StatusCodes.Status500InternalServerError);
         }

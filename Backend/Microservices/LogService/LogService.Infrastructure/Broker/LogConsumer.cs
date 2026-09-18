@@ -8,20 +8,27 @@ using LogService.Infrastructure.Constants;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace LogService.Infrastructure.Broker;
 
-public class LogConsumer : BackgroundService
+internal class LogConsumer : BackgroundService
 {
     private readonly IPulsarClient _client;
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly IConfiguration _configuration;
+    private readonly ILogger<LogConsumer> _logger;
 
-    public LogConsumer(IPulsarClient client, IServiceScopeFactory serviceScopeFactory, IConfiguration configuration)
+    public LogConsumer(
+        IPulsarClient client,
+        IServiceScopeFactory serviceScopeFactory,
+        IConfiguration configuration,
+        ILogger<LogConsumer> logger)
     {
         _client = client;
         _serviceScopeFactory = serviceScopeFactory;
         _configuration = configuration;
+        _logger = logger;
     }
 
     protected async override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -49,8 +56,10 @@ public class LogConsumer : BackgroundService
 
                 await consumer.Acknowledge(message, stoppingToken);
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex.Message);
+
                 await consumer.RedeliverUnacknowledgedMessages(new[] { message.MessageId }, stoppingToken);
             }
         }

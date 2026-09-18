@@ -12,7 +12,7 @@ using ProductService.Infrastructure.Constants;
 
 namespace ProductService.Infrastructure.Broker;
 
-public class OrderCreationConsumer : BackgroundService
+internal class OrderCreationConsumer : BackgroundService
 {
     private readonly IPulsarClient _pulsarClient;
     private readonly IServiceScopeFactory _serviceScopeFactory;
@@ -52,12 +52,12 @@ public class OrderCreationConsumer : BackgroundService
 
                 if (!message.Properties.TryGetValue(BrokerEventConfigurations.EventIdProperyKey, out var eventId))
                 {
-                    throw new InvalidDataException("Không tìm thấy Event Id");
+                    throw new InvalidDataException(nameof(eventId));
                 }
 
                 if (!Guid.TryParse(eventId, out var guidEventId))
                 {
-                    throw new InvalidDataException("Không thể chuyển Event Id thành Guid");
+                    throw new InvalidDataException(nameof(guidEventId));
                 }
 
                 var objMessage = JsonSerializer.Deserialize<OrderCreatedMessage>(message.Value());
@@ -73,7 +73,7 @@ public class OrderCreationConsumer : BackgroundService
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.ToString());
+                _logger.LogError(ex.Message);
 
                 await consumer.RedeliverUnacknowledgedMessages(new[] { message.MessageId }, stoppingToken);
             }

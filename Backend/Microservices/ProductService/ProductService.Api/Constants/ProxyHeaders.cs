@@ -1,6 +1,6 @@
 ﻿namespace ProductService.Api.Constants;
 
-public static class ProxyHeaders
+internal static class ProxyHeaders
 {
     public const string UserId = "X-User-Id";
     public const string UserName = "X-User-Name";

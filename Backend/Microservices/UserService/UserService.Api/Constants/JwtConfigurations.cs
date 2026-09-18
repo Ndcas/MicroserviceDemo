@@ -1,6 +1,6 @@
 ﻿namespace UserService.Api.Constants;
 
-public static class JwtConfigurations
+internal static class JwtConfigurations
 {
     public const string ClaimTypeUserId = "sub";
     public const string ClaimTypeName = "name";

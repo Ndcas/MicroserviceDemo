@@ -8,23 +8,20 @@ using UserService.Domain.Interfaces;
 
 namespace UserService.Application.Services;
 
-public class AccountService : IAccountService
+internal class AccountService : IAccountService
 {
     private readonly IConfiguration _configuration;
-    private readonly IUnitOfWork _unitOfWork;
     private readonly IAccountRepository _accountRepository;
     private readonly ICacheService _cache;
     private readonly ITokenService _token;
 
     public AccountService(
             IConfiguration configuration,
-            IUnitOfWork unitOfWork,
             IAccountRepository accountRepository,
             ICacheService cache,
             ITokenService token)
     {
         _configuration = configuration;
-        _unitOfWork = unitOfWork;
         _accountRepository = accountRepository;
         _cache = cache;
         _token = token;
@@ -36,32 +33,17 @@ public class AccountService : IAccountService
 
         if (account is null)
         {
-            return new ServiceResponse<LoginResponseData>(
-                false,
-                StatusCodes.Status400BadRequest,
-                null,
-                LoginResponseMessages.IncorrectCredentials,
-                null);
+            return ServiceResponse<LoginResponseData>.Fail(StatusCodes.Status400BadRequest, AccountServiceMessages.IncorrectCredentials);
         }
 
         if (Hash.GenerateHash(request.Password) != account.Password)
         {
-            return new ServiceResponse<LoginResponseData>(
-                false,
-                StatusCodes.Status400BadRequest,
-                null,
-                LoginResponseMessages.IncorrectCredentials,
-                null);
+            return ServiceResponse<LoginResponseData>.Fail(StatusCodes.Status400BadRequest, AccountServiceMessages.IncorrectCredentials);
         }
 
         if (account.IsActive == AccountStatus.Disabled)
         {
-            return new ServiceResponse<LoginResponseData>(
-                false,
-                StatusCodes.Status400BadRequest,
-                null,
-                LoginResponseMessages.IncorrectCredentials,
-                null);
+            return ServiceResponse<LoginResponseData>.Fail(StatusCodes.Status400BadRequest, AccountServiceMessages.IncorrectCredentials);
         }
 
         var accessToken = _token.GenerateAccessToken(account.Id, account.Username, account.RoleId);
@@ -77,12 +59,7 @@ public class AccountService : IAccountService
 
         var data = new LoginResponseData(accessToken, refreshToken);
 
-        return new ServiceResponse<LoginResponseData>(
-            true,
-            StatusCodes.Status200OK,
-            null,
-            null,
-            data);
+        return ServiceResponse<LoginResponseData>.Success(StatusCodes.Status200OK, data);
     }
 
     public async Task<ServiceResponse> LogoutAsync(string refreshToken, CancellationToken cancellationToken = default)
@@ -91,22 +68,14 @@ public class AccountService : IAccountService
 
         if (claims is null)
         {
-            return new ServiceResponse(
-                false,
-                StatusCodes.Status400BadRequest,
-                null,
-                LogoutResponseMessages.InvalidToken);
+            return ServiceResponse.Fail(StatusCodes.Status400BadRequest, AccountServiceMessages.InvalidToken);
         }
 
-        var accountId = int.Parse(claims[JwtConfigurations.ClaimTypeUserId].ToString()!);
+        var accountId = int.Parse(claims[JwtConfigurations.ClaimTypeUserId].ToString());
 
         await _cache.RemoveAsync(RedisKeys.RefreshToken(accountId), cancellationToken);
 
-        return new ServiceResponse(
-            true,
-            StatusCodes.Status200OK,
-            LogoutResponseMessages.Success,
-            null);
+        return ServiceResponse.Success(StatusCodes.Status200OK);
     }
 
     public async Task<ServiceResponse<RefreshResponseData>> RefreshAsync(
@@ -117,26 +86,16 @@ public class AccountService : IAccountService
 
         if (claims is null)
         {
-            return new ServiceResponse<RefreshResponseData>(
-                false,
-                StatusCodes.Status400BadRequest,
-                null,
-                RefreshResponseMessages.InvalidToken,
-                null);
+            return ServiceResponse<RefreshResponseData>.Fail(StatusCodes.Status400BadRequest, AccountServiceMessages.InvalidToken);
         }
 
-        var accountId = int.Parse(claims[JwtConfigurations.ClaimTypeUserId].ToString()!);
+        var accountId = int.Parse(claims[JwtConfigurations.ClaimTypeUserId].ToString());
 
         var cachedRefreshToken = await _cache.GetAsync<string>(RedisKeys.RefreshToken(accountId), cancellationToken);
 
         if (cachedRefreshToken is null || cachedRefreshToken != refreshToken)
         {
-            return new ServiceResponse<RefreshResponseData>(
-                false,
-                StatusCodes.Status400BadRequest,
-                null,
-                RefreshResponseMessages.InvalidToken,
-                null);
+            return ServiceResponse<RefreshResponseData>.Fail(StatusCodes.Status400BadRequest, AccountServiceMessages.InvalidToken);
         }
 
         var username = claims[JwtConfigurations.ClaimTypeName].ToString();
@@ -146,11 +105,6 @@ public class AccountService : IAccountService
 
         var refreshResponse = new RefreshResponseData(accessToken);
 
-        return new ServiceResponse<RefreshResponseData>(
-            true,
-            StatusCodes.Status200OK,
-            null,
-            null,
-            refreshResponse);
+        return ServiceResponse<RefreshResponseData>.Success(StatusCodes.Status200OK, refreshResponse);
     }
 }

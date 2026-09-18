@@ -1,14 +1,14 @@
 ﻿using System.Text.Json;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Http;
+using ProductService.Application.Constants;
 using ProductService.Application.Dtos;
 using ProductService.Application.Interfaces;
 using ProductService.Domain.Interfaces;
-using ProductService.Application.Constants;
-using Microsoft.AspNetCore.Http;
 
 namespace ProductService.Application.Services;
 
-public class MessageService : IMessageService
+internal class MessageService : IMessageService
 {
     private readonly IMessageRepository _messageRepository;
     private readonly IUnitOfWork _unitOfWork;
@@ -37,18 +37,18 @@ public class MessageService : IMessageService
         {
             message.UpdatePublishedTime();
 
-            var eventMessage = JsonSerializer.Deserialize<ReservationEventMessage>(message.Payload);
+            var eventMessage = JsonSerializer.Deserialize<OrderIdMessage>(message.Payload);
 
             if (message.Topic == _reservationCompletedTopic)
             {
-                await _reservationEventProducer.NotifyReservationSucceededAsync(eventMessage, cancellationToken);
+                await _reservationEventProducer.NotifyReservationSucceededAsync(message.EventId, eventMessage, cancellationToken);
 
                 continue;
             }
 
             if (message.Topic == _reservationFailedTopic)
             {
-                await _reservationEventProducer.NotifyReservationFailedAsync(eventMessage, cancellationToken);
+                await _reservationEventProducer.NotifyReservationFailedAsync(message.EventId, eventMessage, cancellationToken);
 
                 continue;
             }
@@ -56,10 +56,6 @@ public class MessageService : IMessageService
 
         await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
-        return new ServiceResponse(
-            true,
-            StatusCodes.Status200OK,
-            null,
-            null);
+        return ServiceResponse.Success(StatusCodes.Status200OK);
     }
 }

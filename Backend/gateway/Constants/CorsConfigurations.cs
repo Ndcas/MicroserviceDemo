@@ -1,6 +1,6 @@
 ﻿namespace Gateway.Constants;
 
-public static class CorsConfigurations
+internal static class CorsConfigurations
 {
     public const string PolicyName = "MicroserviceDemoCORS";
 }

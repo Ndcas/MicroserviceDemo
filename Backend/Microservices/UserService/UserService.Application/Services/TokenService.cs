@@ -8,7 +8,7 @@ using UserService.Application.Interfaces;
 
 namespace UserService.Application.Services;
 
-public class TokenService : ITokenService
+internal class TokenService : ITokenService
 {
     private readonly IConfiguration _configuration;
 
