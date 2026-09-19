@@ -1,0 +1,51 @@
+@using Frontend.Dtos
+@using Frontend.Interfaces
+@inject IProductService ProductService
+@inject ICartService CartService
+
+<style>
+    .product-card-image, .product-card-placeholder {
+        height: 220px;
+        object-fit: cover;
+        object-fit: fill;
+    }
+</style>
+
+<div class="col">
+    <article class="card h-100 shadow-sm">
+        @if (!string.IsNullOrWhiteSpace(Product.Image))
+        {
+            <img src="@ProductService.GetProductImageUrl(Product.Image)" class="card-img-top product-card-image" alt="@Product.Name" loading="lazy" />
+        }
+        else
+        {
+            <div class="product-card-placeholder d-flex align-items-center justify-content-center bg-light text-secondary">
+                <span>No image</span>
+            </div>
+        }
+
+        <div class="card-body d-flex flex-column">
+            <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                <h5 class="card-title mb-0">@Product.Name</h5>
+
+                <span class="badge text-success">@Product.Availables available</span>
+            </div>
+
+            <div class="mt-auto">
+                <div class="d-flex justify-content-between align-items-center">
+                    <p class="fs-5 fw-semibold text-primary mb-0">@Product.Price.ToString("N0")đ</p>
+
+                    <button @onclick="() => AddToCartCallback.InvokeAsync(Product.Id)" class="btn btn-primary">+</button>
+                </div>
+            </div>
+        </div>
+    </article>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public AvailableProductItem Product { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public EventCallback<int> AddToCartCallback { get; set; }
+}

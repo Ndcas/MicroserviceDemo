@@ -12,7 +12,7 @@ public static class DependencyInjection
     {
         services.AddHttpClient(HttpClientNames.ProductService, client =>
         {
-            client.BaseAddress = new Uri(configuration[EnvironmentVariableKeys.ProductServiceInternalApiUrl]);
+            client.BaseAddress = new Uri(configuration[EnvironmentVariableKeys.ProductServiceApiUrl]);
         });
 
         services.AddScoped<IOrdersService, OrdersService>();

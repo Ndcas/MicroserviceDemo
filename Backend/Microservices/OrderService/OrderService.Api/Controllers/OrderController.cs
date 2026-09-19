@@ -1,7 +1,6 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using OrderService.Api.Constants;
 using OrderService.Application.Dtos;
 using OrderService.Application.Interfaces;
@@ -45,7 +44,7 @@ public class OrderController : ControllerBase
                 return StatusCode(response.Status, response.Error);
             }
 
-            return StatusCode(response.Status);
+            return StatusCode(response.Status, response.Data);
         }
         catch (Exception ex)
         {
@@ -55,9 +54,9 @@ public class OrderController : ControllerBase
         }
     }
 
-    [HttpPatch("Cancel")]
+    [HttpPatch("Cancel/{id:int}")]
     [Authorize(Roles = AccountRoles.Buyer)]
-    public async Task<IActionResult> CancelOrderAsync(OrderIdMessage request, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> CancelOrderAsync(int id, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -68,7 +67,7 @@ public class OrderController : ControllerBase
                 return StatusCode(StatusCodes.Status400BadRequest);
             }
 
-            var response = await _ordersService.CancelOrderAsync(userId, request, cancellationToken);
+            var response = await _ordersService.CancelOrderAsync(userId, id, cancellationToken);
 
             if (!response.Ok)
             {
@@ -88,13 +87,13 @@ public class OrderController : ControllerBase
     }
 
     //Demo only, replace by IPN webhook call later
-    [HttpGet("Pay")]
+    [HttpGet("Pay/{id:int}")]
     [Authorize(Roles = AccountRoles.Buyer)]
-    public async Task<IActionResult> ConnfirmPaymentAsync(OrderIdMessage request, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> ConnfirmPaymentAsync(int id, CancellationToken cancellationToken = default)
     {
         try
         {
-            var response = await _ordersService.ConfirmPaymentAsync(request, cancellationToken);
+            var response = await _ordersService.ConfirmPaymentAsync(id, cancellationToken);
 
             if (!response.Ok)
             {
@@ -113,13 +112,13 @@ public class OrderController : ControllerBase
         }
     }
 
-    [HttpPatch("Complete")]
+    [HttpPatch("Complete/{id:int}")]
     [Authorize(Roles = AccountRoles.Admin)]
-    public async Task<IActionResult> CompleteOrdersync(OrderIdMessage request, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> CompleteOrdersync(int id, CancellationToken cancellationToken = default)
     {
         try
         {
-            var response = await _ordersService.CompleteOrderASync(request, cancellationToken);
+            var response = await _ordersService.CompleteOrderASync(id, cancellationToken);
 
             if (!response.Ok)
             {
@@ -184,7 +183,7 @@ public class OrderController : ControllerBase
 
     [HttpGet]
     [Authorize(Roles = AccountRoles.Any)]
-    public async Task<IActionResult> GetOrderAsync(
+    public async Task<IActionResult> GetOrdersAsync(
         [FromQuery] int page = DefaultPagination.Page,
         [FromQuery] int take = DefaultPagination.Take,
         CancellationToken cancellationToken = default)

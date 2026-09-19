@@ -102,6 +102,18 @@ internal class OrderRepository : IOrderRepository
             .ToListAsync();
     }
 
+    public async Task<int> CountOrderAsync(CancellationToken cancellationToken = default)
+    {
+        return await _context.Orders.CountAsync(cancellationToken);
+    }
+
+    public async Task<int> CountOrderAsync(int userId, CancellationToken cancellationToken = default)
+    {
+        return await _context.Orders
+            .Where(order => order.UserId == userId)
+            .CountAsync(cancellationToken);
+    }
+
     private async Task PerformOrderRemoval(Order order, CancellationToken cancellationToken = default)
     {
         await _context.OrderDetails

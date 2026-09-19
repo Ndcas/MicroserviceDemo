@@ -1,0 +1,81 @@
+@page "/orders"
+@using Frontend.Components
+@using Microsoft.AspNetCore.Authorization
+@layout MainLayout
+@attribute [Authorize]
+
+<PageTitle>Orders</PageTitle>
+
+<div class="container py-4">
+    <h1 class="mb-4">Orders</h1>
+
+    @if (_isLoading)
+    {
+        <div class="d-flex justify-content-center py-5" role="status">
+            <div class="spinner-border text-primary" aria-hidden="true"></div>
+            <span class="visually-hidden">Loading orders...</span>
+        </div>
+    }
+    else if (!string.IsNullOrWhiteSpace(_errorMessage))
+    {
+        <div class="alert alert-danger" role="alert">@_errorMessage</div>
+    }
+    else if (_orders.Count == 0)
+    {
+        <div class="alert alert-info" role="status">You do not have any orders yet.</div>
+    }
+    else
+    {
+        <OrderTable Orders="_orders"
+                    CancelOrderCallback="CancelOrderAsync"
+                    PayForOrderCallback="PayOrderAsync"
+                    CompleteOrderCallback="CompleteOrderAsync"
+                    Role="@_userRole"
+                    @bind-ProcessingId="_processingOrderId" />
+
+        @if (_maxPage > 1)
+        {
+            <nav class="mt-4" aria-label="Orders pagination">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item @(_page == 1 || _isLoading ? "disabled" : null)">
+                        <button class="page-link"
+                                type="button"
+                                disabled="@(_page == 1 || _isLoading)"
+                                @onclick="() => GoToPageAsync(_page - 1)">
+                            Previous
+                        </button>
+                    </li>
+
+                    @{
+                        var minPage = Math.Max(1, _page - VisiblePage / 2);
+                        var maxPage = Math.Min(_maxPage, _page + VisiblePage / 2);
+                    }
+
+                    @for (var page = minPage; page <= maxPage; page++)
+                    {
+                        var pageNumber = page;
+
+                        <li class="page-item @(_page == pageNumber ? "active" : null)">
+                            <button class="page-link"
+                                    type="button"
+                                    aria-current="@(_page == pageNumber ? "page" : null)"
+                                    disabled="@(_page == pageNumber || _isLoading)"
+                                    @onclick="() => GoToPageAsync(pageNumber)">
+                                @pageNumber
+                            </button>
+                        </li>
+                    }
+
+                    <li class="page-item @(_page == _maxPage || _isLoading ? "disabled" : null)">
+                        <button class="page-link"
+                                type="button"
+                                disabled="@(_page == _maxPage || _isLoading)"
+                                @onclick="() => GoToPageAsync(_page + 1)">
+                            Next
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+        }
+    }
+</div>

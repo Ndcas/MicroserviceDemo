@@ -9,26 +9,26 @@ public interface IOrdersService
         IReadOnlyList<ProductWithQuantityItem> request,
         CancellationToken cancellationToken = default);
 
-    Task<ServiceResponse> CancelOrderAsync(int userId, OrderIdMessage request, CancellationToken cancellationToken = default);
+    Task<ServiceResponse> CancelOrderAsync(int userId, int orderId, CancellationToken cancellationToken = default);
 
     Task<ServiceResponse> ConfirmReservationAsync(Guid eventId, OrderIdMessage request, CancellationToken cancellationToken = default);
 
-    Task<ServiceResponse> ConfirmPaymentAsync(OrderIdMessage request, CancellationToken cancellationToken = default);
+    Task<ServiceResponse> ConfirmPaymentAsync(int orderId, CancellationToken cancellationToken = default);
 
     Task<ServiceResponse> RemoveOrderAsync(Guid eventId, OrderIdMessage request, CancellationToken cancellationToken = default);
 
-    Task<ServiceResponse> CompleteOrderASync(OrderIdMessage request, CancellationToken cancellationToken = default);
+    Task<ServiceResponse> CompleteOrderASync(int orderId, CancellationToken cancellationToken = default);
 
     Task<ServiceResponse<OrderResponseData>> GetOrderDetailsAsync(int orderId, CancellationToken cancellationToken = default);
 
     Task<ServiceResponse<OrderResponseData>> GetOrderDetailsAsync(int userId, int orderId, CancellationToken cancellationToken = default);
 
-    Task<ServiceResponse<IReadOnlyList<OrderResponseData>>> GetOrdersAsync(
+    Task<ServiceResponse<OrderListResponseData>> GetOrdersAsync(
         int page,
         int take,
         CancellationToken cancellationToken = default);
 
-    Task<ServiceResponse<IReadOnlyList<OrderResponseData>>> GetOrdersAsync(
+    Task<ServiceResponse<OrderListResponseData>> GetOrdersAsync(
         int page,
         int take,
         int userId,

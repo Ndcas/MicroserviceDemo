@@ -1,3 +1,3 @@
 ﻿namespace OrderService.Application.Dtos;
 
-public class OrderDetailItem(int ProductId, decimal PriceAtBooking, int Quantity);
+public record OrderDetailItem(int ProductId, decimal PriceAtBooking, int Quantity);

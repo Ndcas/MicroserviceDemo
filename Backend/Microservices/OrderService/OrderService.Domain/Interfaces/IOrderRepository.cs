@@ -23,4 +23,8 @@ public interface IOrderRepository
         int page,
         int take,
         CancellationToken cancellationToken = default);
+
+    Task<int> CountOrderAsync(CancellationToken cancellationToken = default);
+
+    Task<int> CountOrderAsync(int userId, CancellationToken cancellationToken = default);
 }

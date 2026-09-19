@@ -1,0 +1,89 @@
+@using Frontend.Dtos
+@using Frontend.Interfaces
+@inject IProductService ProductService
+
+<style>
+    .cart-product-image {
+        width: 56px;
+        height: 56px;
+        object-fit: cover;
+    }
+
+    .quantity-value {
+        min-width: 1.5rem;
+        text-align: center;
+    }
+</style>
+
+<div class="table-responsive">
+    <table class="table align-middle">
+        <thead class="table-light">
+            <tr>
+                <th scope="col">Product</th>
+
+                <th scope="col" class="text-end">Price</th>
+
+                <th scope="col" class="text-center">Quantity</th>
+
+                <th scope="col" class="text-end">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var product in Products)
+            {
+                var quantity = Quantities.GetValueOrDefault(product.Id);
+
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center gap-3">
+                            @if (!string.IsNullOrWhiteSpace(product.Image))
+                            {
+                                <img src="@ProductService.GetProductImageUrl(product.Image)" class="cart-product-image rounded" alt="@product.Name" />
+                            }
+
+                            <span class="fw-semibold">@product.Name</span>
+                        </div>
+                    </td>
+
+                    <td class="text-end">@product.Price.ToString("N0")đ</td>
+
+                    <td>
+                        <div class="d-flex justify-content-center align-items-center gap-2">
+                            <button type="button"
+                                    class="btn btn-outline-secondary btn-sm"
+                                    aria-label="Decrease @product.Name quantity"
+                                    @onclick="() => OnDecrease.InvokeAsync(product.Id)">
+                                −
+                            </button>
+
+                            <span class="quantity-value">@quantity</span>
+
+                            <button type="button"
+                                    class="btn btn-outline-secondary btn-sm"
+                                    aria-label="Increase @product.Name quantity"
+                                    @onclick="() => OnIncrease.InvokeAsync(product.Id)">
+                                +
+                            </button>
+                        </div>
+                    </td>
+
+                    <td class="text-end fw-semibold">@((product.Price * quantity).ToString("N0"))đ</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public IReadOnlyList<CartProductItem> Products { get; set; }
+
+    [Parameter, EditorRequired]
+    public IReadOnlyDictionary<int, int> Quantities { get; set; }
+
+    [Parameter, EditorRequired]
+    public EventCallback<int> OnIncrease { get; set; }
+
+    [Parameter, EditorRequired]
+    public EventCallback<int> OnDecrease { get; set; }
+}

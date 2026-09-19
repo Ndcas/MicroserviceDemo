@@ -34,7 +34,7 @@ internal class OrdersService : IOrdersService
         _productServiceHttpClient = httpClientFactory.CreateClient(HttpClientNames.ProductService);
 
         _orderCreatedTopic = configuration[EnvironmentVariableKeys.OrderCreatedTopic];
-        _orderCanceledTopic = configuration[EnvironmentVariableKeys.OrderCreatedTopic];
+        _orderCanceledTopic = configuration[EnvironmentVariableKeys.OrderCanceledTopic];
         _paymentCompletedTopic = configuration[EnvironmentVariableKeys.PaymentCompletedTopic];
     }
 
@@ -85,16 +85,16 @@ internal class OrdersService : IOrdersService
             Payload = JsonSerializer.Serialize(message)
         });
 
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
         return ServiceResponse<PlaceOrderResponseData>.Success(StatusCodes.Status201Created, new PlaceOrderResponseData(newOrder.Id));
     }
 
-    public async Task<ServiceResponse> CancelOrderAsync(int userId, OrderIdMessage request, CancellationToken cancellationToken = default)
+    public async Task<ServiceResponse> CancelOrderAsync(int userId, int orderId, CancellationToken cancellationToken = default)
     {
         await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-        var order = await _orderRepository.GetOrderByIdForUpdateAsync(request.OrderId, cancellationToken);
+        var order = await _orderRepository.GetOrderWithDetailsByIdForUpdateAsync(orderId, cancellationToken);
 
         if (order is null)
         {
@@ -128,11 +128,11 @@ internal class OrdersService : IOrdersService
         return ServiceResponse.Success(StatusCodes.Status200OK);
     }
 
-    public async Task<ServiceResponse> CompleteOrderASync(OrderIdMessage request, CancellationToken cancellationToken = default)
+    public async Task<ServiceResponse> CompleteOrderASync(int orderId, CancellationToken cancellationToken = default)
     {
         await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-        var order = await _orderRepository.GetOrderByIdForUpdateAsync(request.OrderId, cancellationToken);
+        var order = await _orderRepository.GetOrderByIdForUpdateAsync(orderId, cancellationToken);
 
         if (order is null)
         {
@@ -183,10 +183,7 @@ internal class OrdersService : IOrdersService
         return ServiceResponse.Success(StatusCodes.Status200OK);
     }
 
-    public async Task<ServiceResponse> RemoveOrderAsync(
-        Guid eventId,
-        OrderIdMessage request,
-        CancellationToken cancellationToken = default)
+    public async Task<ServiceResponse> RemoveOrderAsync(Guid eventId, OrderIdMessage request, CancellationToken cancellationToken = default)
     {
         await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
@@ -218,11 +215,11 @@ internal class OrdersService : IOrdersService
         return ServiceResponse.Success(StatusCodes.Status200OK);
     }
 
-    public async Task<ServiceResponse> ConfirmPaymentAsync(OrderIdMessage request, CancellationToken cancellationToken = default)
+    public async Task<ServiceResponse> ConfirmPaymentAsync(int orderId, CancellationToken cancellationToken = default)
     {
         await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-        var order = await _orderRepository.GetOrderWithDetailsByIdForUpdateAsync(request.OrderId, cancellationToken);
+        var order = await _orderRepository.GetOrderWithDetailsByIdForUpdateAsync(orderId, cancellationToken);
 
         if (order is null)
         {
@@ -271,10 +268,7 @@ internal class OrdersService : IOrdersService
         return ServiceResponse<OrderResponseData>.Success(StatusCodes.Status200OK, data);
     }
 
-    public async Task<ServiceResponse<OrderResponseData>> GetOrderDetailsAsync(
-        int userId,
-        int orderId,
-        CancellationToken cancellationToken = default)
+    public async Task<ServiceResponse<OrderResponseData>> GetOrderDetailsAsync(int userId, int orderId, CancellationToken cancellationToken = default)
     {
         var order = await _orderRepository.GetOrderWithDetailsByIdAsync(orderId, cancellationToken);
 
@@ -301,10 +295,7 @@ internal class OrdersService : IOrdersService
         return ServiceResponse<OrderResponseData>.Success(StatusCodes.Status200OK, data);
     }
 
-    public async Task<ServiceResponse<IReadOnlyList<OrderResponseData>>> GetOrdersAsync(
-        int page,
-        int take,
-        CancellationToken cancellationToken = default)
+    public async Task<ServiceResponse<OrderListResponseData>> GetOrdersAsync(int page, int take, CancellationToken cancellationToken = default)
     {
         var orders = await _orderRepository.GetOrderListAsync(page, take, cancellationToken);
 
@@ -320,10 +311,12 @@ internal class OrdersService : IOrdersService
                     .ToList()))
             .ToList();
 
-        return ServiceResponse<IReadOnlyList<OrderResponseData>>.Success(StatusCodes.Status200OK, data);
+        var count = await _orderRepository.CountOrderAsync(cancellationToken);
+
+        return ServiceResponse<OrderListResponseData>.Success(StatusCodes.Status200OK, new OrderListResponseData(count, data));
     }
 
-    public async Task<ServiceResponse<IReadOnlyList<OrderResponseData>>> GetOrdersAsync(
+    public async Task<ServiceResponse<OrderListResponseData>> GetOrdersAsync(
         int page,
         int take,
         int userId,
@@ -343,6 +336,9 @@ internal class OrdersService : IOrdersService
                     .ToList()))
             .ToList();
 
-        return ServiceResponse<IReadOnlyList<OrderResponseData>>.Success(StatusCodes.Status200OK, data);
+
+        var count = await _orderRepository.CountOrderAsync(userId, cancellationToken);
+
+        return ServiceResponse<OrderListResponseData>.Success(StatusCodes.Status200OK, new OrderListResponseData(count, data));
     }
 }

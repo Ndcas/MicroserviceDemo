@@ -10,11 +10,10 @@ internal class OutboxMessageTracker : BackgroundService
 {
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly ILogger<OutboxMessageTracker> _logger;
-    private readonly TimeSpan _period = TimeSpan.FromSeconds(10);
+    private readonly TimeSpan _period = TimeSpan.FromSeconds(5);
 
     public OutboxMessageTracker(
         IServiceScopeFactory serviceScopeFactory,
-        IConfiguration configuration,
         ILogger<OutboxMessageTracker> logger)
     {
         _serviceScopeFactory = serviceScopeFactory;

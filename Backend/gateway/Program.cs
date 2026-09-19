@@ -41,9 +41,9 @@ builder.Services
 
         if (user.Identity?.IsAuthenticated == true)
         {
-            string userId = user.FindFirstValue(JwtConfigurations.ClaimTypeUserId)!;
-            string name = user.FindFirstValue(JwtConfigurations.ClaimTypeName)!;
-            string roleId = user.FindFirstValue(JwtConfigurations.ClaimTypeRoleId)!;
+            string userId = user.FindFirstValue(JwtConfigurations.ClaimTypeUserId);
+            string name = user.FindFirstValue(JwtConfigurations.ClaimTypeName);
+            string roleId = user.FindFirstValue(JwtConfigurations.ClaimTypeRoleId);
 
             transformContext.ProxyRequest.Headers.Add(ReverseProxyConfigurations.UserIdHeaderName, userId);
 
@@ -87,6 +87,8 @@ SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKe
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
+    options.MapInboundClaims = false;
+
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuerSigningKey = true,

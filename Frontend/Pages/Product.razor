@@ -1,0 +1,43 @@
+﻿@page "/product"
+@using Frontend.Components
+@using Microsoft.AspNetCore.Authorization
+@layout MainLayout
+@attribute [Authorize]
+
+<PageTitle>Products</PageTitle>
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="mb-1">Products</h1>
+
+            <p class="text-secondary mb-0">Browse available products.</p>
+        </div>
+    </div>
+
+    @if (_isLoading)
+    {
+        <div class="d-flex justify-content-center py-5" role="status">
+            <div class="spinner-border text-primary" aria-hidden="true"></div>
+
+            <span class="visually-hidden">Loading products...</span>
+        </div>
+    }
+    else if (!string.IsNullOrWhiteSpace(_errorMessage))
+    {
+        <div class="alert alert-danger" role="alert">@_errorMessage</div>
+    }
+    else if (_products.Count == 0)
+    {
+        <div class="alert alert-info" role="status">No products are currently available.</div>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-4">
+            @foreach (var product in _products)
+            {
+                <ProductCard Product="product" AddToCartCallback="AddToCart" />
+            }
+        </div>
+    }
+</div>

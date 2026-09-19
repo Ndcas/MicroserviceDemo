@@ -1,16 +1,28 @@
-﻿@inherits LayoutComponentBase
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+﻿@using Frontend.Constants
+@inherits LayoutComponentBase
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+<header>
+    <nav class="navbar navbar-expand bg-white border-bottom shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-semibold" href="@Routes.Product">Shop</a>
+
+            <div class="navbar-nav">
+                <NavLink class="nav-link" href="@Routes.Product" Match="NavLinkMatch.All">Products</NavLink>
+
+                <NavLink class="nav-link" href="@Routes.Cart" Match="NavLinkMatch.All">Cart</NavLink>
+
+                <NavLink class="nav-link" href="@Routes.Orders" Match="NavLinkMatch.All">Orders</NavLink>
+            </div>
+
+            <button class="btn btn-outline-danger ms-3"
+                    type="button"
+                    @onclick="Logout">
+                Logout
+            </button>
         </div>
+    </nav>
+</header>
 
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
+<main>
+    @Body
+</main>

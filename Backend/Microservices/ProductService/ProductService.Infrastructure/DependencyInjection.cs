@@ -40,6 +40,8 @@ public static class DependencyInjection
 
         services.AddHostedService<OutboxMessageTracker>();
 
+        services.AddHostedService<OrderCancellationConsumer>();
+
         services.AddHostedService<OrderCreationConsumer>();
 
         services.AddHostedService<PaymentCompletionConsumer>();

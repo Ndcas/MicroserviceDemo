@@ -2,5 +2,5 @@
 
 internal static class ProductServiceEndpoints
 {
-    public const string GetProductPrice = "Price";
+    public const string GetProductPrice = "/InternalProduct/Price";
 }

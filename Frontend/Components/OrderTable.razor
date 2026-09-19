@@ -1,0 +1,113 @@
+@using Frontend.Constants
+@using Frontend.Dtos
+
+<div class="table-responsive">
+    <table class="table align-middle">
+        <thead class="table-light">
+            <tr>
+                <th scope="col">Order</th>
+
+                <th scope="col">Created</th>
+
+                <th scope="col">Status</th>
+
+                <th scope="col" class="text-end">Action</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var order in Orders)
+            {
+                var orderDetails = order.OrderDetails ?? [];
+
+                <tr>
+                    <th scope="row">#@order.OrderId</th>
+
+                    <td>@order.CreatedAt.ToLocalTime().ToString("g")</td>
+
+                    <td>
+                        <span class="badge @GetStatusClass(order.Status)">@order.Status</span>
+                    </td>
+
+                    <td class="text-end">
+                        @if (Role == AccountRoles.Buyer)
+                        {
+                            @if (order.Status == OrderStatuses.Unpaid)
+                            {
+                                <button type="button"
+                                        class="btn btn-outline-danger btn-sm me-2"
+                                        disabled="@(ProcessingId == order.OrderId)"
+                                        @onclick="() => CancelOrderCallback.InvokeAsync(order.OrderId)">
+                                    <span>Cancel</span>
+                                </button>
+
+                                <button type="button"
+                                        class="btn btn-outline-success btn-sm"
+                                        disabled="@(ProcessingId == order.OrderId)"
+                                        @onclick="() => PayForOrderCallback.InvokeAsync(order.OrderId)">
+                                    <span>Pay</span>
+                                </button>
+                            }
+                            else
+                            {
+                                <span class="text-secondary">—</span>
+                            }
+                        }
+                        else if (Role == AccountRoles.Admin)
+                        {
+                            @if (order.Status == OrderStatuses.Confirmed)
+                            {
+                                <button type="button"
+                                        class="btn btn-outline-success btn-sm me-2"
+                                        disabled="@(ProcessingId == order.OrderId)"
+                                        @onclick="() => CompleteOrderCallback.InvokeAsync(order.OrderId)">
+                                    <span>Finish</span>
+                                </button>
+                            }
+                            else
+                            {
+                                <span class="text-secondary">—</span>
+                            }
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Role { get; set; }
+
+    [Parameter]
+    public int? ProcessingId { get; set; }
+
+    [Parameter]
+    public EventCallback<int?> ProcessingIdChanged { get; set; }
+
+    private static string GetStatusClass(string status)
+    {
+        return status.ToUpperInvariant() switch
+        {
+            OrderStatuses.Unpaid => "text-warning",
+            OrderStatuses.Processing => "text-info",
+            OrderStatuses.Confirmed => "text-success",
+            OrderStatuses.Finished => "text-success",
+            OrderStatuses.Canceled => "text-secondary",
+            _ => "text-dark"
+        };
+    }
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<OrderData> Orders { get; set; }
+
+    [Parameter, EditorRequired]
+    public EventCallback<int> CancelOrderCallback { get; set; }
+
+    [Parameter, EditorRequired]
+    public EventCallback<int> PayForOrderCallback { get; set; }
+
+    [Parameter, EditorRequired]
+    public EventCallback<int> CompleteOrderCallback { get; set; }
+}

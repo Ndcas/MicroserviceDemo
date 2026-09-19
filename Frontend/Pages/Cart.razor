@@ -1,0 +1,54 @@
+@page "/cart"
+@using Frontend.Components
+@using Microsoft.AspNetCore.Authorization
+@layout MainLayout
+@attribute [Authorize]
+
+<PageTitle>Cart</PageTitle>
+
+<div class="container py-4">
+    <h1 class="mb-4">Cart</h1>
+
+    @if (_isLoading)
+    {
+        <div class="d-flex justify-content-center py-5" role="status">
+            <div class="spinner-border text-primary" aria-hidden="true"></div>
+
+            <span class="visually-hidden">Loading cart...</span>
+        </div>
+    }
+    else if (!string.IsNullOrWhiteSpace(_errorMessage))
+    {
+        <div class="alert alert-danger" role="alert">@_errorMessage</div>
+    }
+    else if (_products.Count == 0)
+    {
+        <div class="alert alert-info" role="status">Your cart is empty.</div>
+    }
+    else
+    {
+        <CartProductTable Products="_products" Quantities="_quantities" OnIncrease="IncreaseQuantity" OnDecrease="DecreaseQuantity" />
+
+        <div class="d-flex flex-column align-items-end gap-3 border-top pt-3">
+            <div class="fs-5">
+                Total: <span class="fw-bold text-primary">@CartTotal().ToString("N0")đ</span>
+            </div>
+
+            <button type="button"
+                    class="btn btn-primary"
+                    disabled="@_isPlacingOrder"
+                    @onclick="PlaceOrderAsync">
+                @if (_isPlacingOrder)
+                {
+                    <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+
+                    <span>Processing...</span>
+                }
+                else
+                {
+                    <span>Place Order</span>
+                }
+            </button>
+        </div>
+    }
+</div>

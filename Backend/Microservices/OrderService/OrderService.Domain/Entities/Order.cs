@@ -20,21 +20,41 @@ public partial class Order
 
     public void Cancel()
     {
+        if (Status != OrderStatuses.Unpaid)
+        {
+            throw new InvalidOperationException();
+        }
+
         Status = OrderStatuses.Canceled;
     }
 
     public void WaitForPayment()
     {
+        if (Status != OrderStatuses.Processing)
+        {
+            throw new InvalidOperationException();
+        }
+
         Status = OrderStatuses.Unpaid;
     }
 
     public void ConfirmPayment()
     {
+        if (Status != OrderStatuses.Unpaid)
+        {
+            throw new InvalidOperationException();
+        }
+
         Status = OrderStatuses.Confirmed;
     }
 
     public void Finish()
     {
+        if (Status != OrderStatuses.Confirmed)
+        {
+            throw new InvalidOperationException();
+        }
+
         Status = OrderStatuses.Finished;
     }
 

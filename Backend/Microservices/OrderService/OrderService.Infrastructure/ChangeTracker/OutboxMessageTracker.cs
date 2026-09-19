@@ -10,7 +10,7 @@ internal class OutboxMessageTracker : BackgroundService
 {
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly ILogger<OutboxMessageTracker> _logger;
-    private readonly TimeSpan _period = TimeSpan.FromSeconds(10);
+    private readonly TimeSpan _period = TimeSpan.FromSeconds(5);
 
     public OutboxMessageTracker(
         IServiceScopeFactory serviceScopeFactory,
@@ -29,7 +29,7 @@ internal class OutboxMessageTracker : BackgroundService
         {
             try
             {
-                using var scope = _serviceScopeFactory.CreateScope();
+                await using var scope = _serviceScopeFactory.CreateAsyncScope();
 
                 var messageService = scope.ServiceProvider.GetRequiredService<IMessageService>();
 

@@ -11,8 +11,8 @@ namespace ProductService.Infrastructure.Broker;
 
 internal class ReservationEventProducer : IReservationEventProducer
 {
-    private IProducer<string> _succeededProducer;
-    private IProducer<string> _failedProducer;
+    private readonly IProducer<string> _succeededProducer;
+    private readonly IProducer<string> _failedProducer;
 
     public ReservationEventProducer(IPulsarClient pulsarClient, IConfiguration configuration)
     {
@@ -30,7 +30,7 @@ internal class ReservationEventProducer : IReservationEventProducer
     {
         var jsonContent = JsonSerializer.Serialize(message);
 
-        await _succeededProducer
+        await _failedProducer
             .NewMessage()
             .Property(BrokerEventConfigurations.EventIdProperyKey, eventId.ToString())
             .Send(jsonContent, cancellationToken);
@@ -43,7 +43,7 @@ internal class ReservationEventProducer : IReservationEventProducer
     {
         var jsonContent = JsonSerializer.Serialize(message);
 
-        await _failedProducer
+        await _succeededProducer
             .NewMessage()
             .Property(BrokerEventConfigurations.EventIdProperyKey, eventId.ToString())
             .Send(jsonContent, cancellationToken);

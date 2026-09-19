@@ -25,7 +25,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("Login")]
-    public async Task<IActionResult> LoginAsync([FromForm] LoginRequest requestData, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> LoginAsync(LoginRequest requestData, CancellationToken cancellationToken = default)
     {
         try
         {
